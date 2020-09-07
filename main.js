@@ -9,6 +9,7 @@ const remove = require('firost/remove');
 const isDirectory = require('firost/isDirectory');
 const move = require('firost/move');
 const _ = require('golgoth/lib/lodash');
+const dedent = require('golgoth/lib/dedent');
 
 module.exports = {
   async run(cliRootPath) {
@@ -19,7 +20,128 @@ module.exports = {
     await this.prepareDocs();
 
     await this.install();
+
+    await this.postInstallDocs();
   },
+
+  // Prepare the docs folder
+  async prepareDocs() {
+    const baseData = await this.initialPackage();
+    const { name, version } = baseData;
+
+    // Write package.json
+    const template = await this.getTemplate('docs/package.json');
+    template.homepage = template.homepage.replace('{name}', name);
+    template.name = template.name.replace('{name}', name);
+    template.version = template.version.replace('{version}', version);
+    await writeJson(template, this.rootPath('docs/package.json'));
+  },
+  // Prepare the lib folder
+  async prepareLib() {
+    const baseData = await this.initialPackage();
+    const { name } = baseData;
+    const files = _.chain(baseData)
+      .get('files')
+      .map((file) => {
+        return file.replace('lib/', '');
+      })
+      .value();
+    const scripts = _.chain(baseData)
+      .get('scripts')
+      .transform((result, value, key) => {
+        result[key] = value.replace('./scripts/', '../scripts/lib/');
+      })
+      .value();
+    const libPackage = {
+      ...baseData,
+      devDependencies: undefined,
+      main: 'main.js',
+      files,
+      scripts,
+      homepage: `https://projects.pixelastic.com/${name}/`,
+    };
+    await writeJson(libPackage, this.rootPath('lib/package.json'));
+
+    // Move bin directory if available
+    if (await isDirectory(this.rootPath('bin/'))) {
+      await move(this.rootPath('bin/'), this.rootPath('lib/bin'));
+    }
+  },
+  // Prepare the root
+  async prepareRoot() {
+    const baseData = await this.initialPackage();
+    const { name, version } = baseData;
+
+    // Write package.json
+    const template = await this.getTemplate('package.json');
+    template.name = template.name.replace('{name}', name);
+    template.description = template.description.replace('{name}', name);
+    template.homepage = template.homepage.replace('{name}', name);
+    await writeJson(template, this.rootPath('package.json'));
+
+    // Replace scripts
+    await remove(this.rootPath('scripts'));
+    await copy(this.templatePath('scripts'), this.rootPath('scripts'));
+
+    // Configure lerna
+    const lernaConfig = await this.getTemplate('lerna.json');
+    lernaConfig.version = version;
+    const lernaFinal = await this.rootPath('lerna.json');
+    await writeJson(lernaConfig, lernaFinal);
+  },
+  // Install all dependencies
+  async install() {
+    // Dev dependencies
+    await run('yarn install && yarn upgrade aberlaas@latest lerna@latest', {
+      shell: true,
+    });
+
+    // Docs
+    const docsPath = this.rootPath('docs');
+    await run(
+      `cd ${docsPath} && yarn upgrade norska@latest norska-theme-docs@latest && yarn install`,
+      { shell: true }
+    );
+    await run(`cd ${docsPath} && yarn run norska init`, {
+      shell: true,
+      stdin: true,
+    });
+  },
+
+  // Fixes after install
+  async postInstallDocs() {
+    // Update netlify.toml
+    const docsToml = this.rootPath('./docs/netlify.toml');
+    const rootToml = this.rootPath('./netlify.toml');
+    let netlifyConf = await read(docsToml);
+    netlifyConf = netlifyConf.replace('"./dist/"', '"./docs/dist"');
+    await write(netlifyConf, rootToml);
+    await remove(docsToml);
+
+    // Fill the meta
+    const libPackage = await readJson(this.rootPath('lib/package.json'));
+    const { description, name, homepage } = libPackage;
+    const siteData = {
+      defaultDescription: description,
+      defaultTitle: name,
+      defaultUrl: homepage,
+      defaultAuthor: 'Tim Carry',
+      defaultTwitter: 'pixelastic',
+    };
+    const dataPath = this.rootPath('docs/src/_data/site.json');
+    await writeJson(siteData, dataPath);
+
+    // Define the theme
+    const norskaConfig = dedent`
+    const theme = require('norska-theme-docs');
+
+    module.exports = {
+      theme,
+    }`;
+    await write(norskaConfig, this.rootPath('docs/norska.config.js'));
+  },
+
+  // Helper functions
   cache: {},
   get(key) {
     return _.get(this.cache, key);
@@ -49,90 +171,5 @@ module.exports = {
   },
   async getTemplate(relativePath = '') {
     return await readJson(this.templatePath(relativePath));
-  },
-
-  async prepareDocs() {
-    const baseData = await this.initialPackage();
-    const { name, version } = baseData;
-
-    // Write package.json
-    const template = await this.getTemplate('docs/package.json');
-    template.homepage = template.homepage.replace('{name}', name);
-    template.name = template.name.replace('{name}', name);
-    template.version = template.version.replace('{version}', version);
-    await writeJson(template, this.rootPath('docs/package.json'));
-  },
-  async prepareLib() {
-    const baseData = await this.initialPackage();
-    const files = _.chain(baseData)
-      .get('files')
-      .map((file) => {
-        return file.replace('lib/', '');
-      })
-      .value();
-    const scripts = _.chain(baseData)
-      .get('scripts')
-      .transform((result, value, key) => {
-        result[key] = value.replace('./scripts/', '../scripts/lib/');
-      })
-      .value();
-    const libPackage = {
-      ...baseData,
-      devDependencies: undefined,
-      main: 'main.js',
-      files,
-      scripts,
-    };
-    await writeJson(libPackage, this.rootPath('lib/package.json'));
-
-    if (await isDirectory(this.rootPath('bin/'))) {
-      await move(this.rootPath('bin/'), this.rootPath('lib/bin'));
-    }
-  },
-  async prepareRoot() {
-    const baseData = await this.initialPackage();
-    const { name, version } = baseData;
-
-    // Write package.json
-    const template = await this.getTemplate('package.json');
-    template.name = template.name.replace('{name}', name);
-    template.description = template.description.replace('{name}', name);
-    template.homepage = template.homepage.replace('{name}', name);
-    await writeJson(template, this.rootPath('package.json'));
-
-    // Replace scripts
-    await remove(this.rootPath('scripts'));
-    await copy(this.templatePath('scripts'), this.rootPath('scripts'));
-
-    // Configure lerna
-    const lernaConfig = await this.getTemplate('lerna.json');
-    lernaConfig.version = version;
-    const lernaFinal = await this.rootPath('lerna.json');
-    await writeJson(lernaConfig, lernaFinal);
-  },
-  async install() {
-    // Dev dependencies
-    await run('yarn install && yarn upgrade aberlaas@latest lerna@latest', {
-      shell: true,
-    });
-
-    // Docs
-    const docsPath = this.rootPath('docs');
-    await run(
-      `cd ${docsPath} && yarn upgrade norska@latest norska-theme-docs@latest && yarn install`,
-      { shell: true }
-    );
-    await run(`cd ${docsPath} && yarn run norska init`, {
-      shell: true,
-      stdin: true,
-    });
-
-    // Update netlify.toml
-    const docsToml = this.rootPath('./docs/netlify.toml');
-    const rootToml = this.rootPath('./netlify.toml');
-    let netlifyConf = await read(docsToml);
-    netlifyConf = netlifyConf.replace('"./dist/"', '"./docs/dist"');
-    await write(netlifyConf, rootToml);
-    await remove(docsToml);
   },
 };
