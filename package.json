@@ -2,9 +2,15 @@
   "devDependencies": {
     "aberlaas": "1.13.0"
   },
-  "files": ["lib/*.js"],
+  "bin": [
+    "bin/monorepoify"
+  ],
+  "files": [
+    "bin/",
+    "main.js"
+  ],
   "license": "MIT",
-  "main": "lib/main.js",
+  "main": "main.js",
   "name": "monorepoify",
   "scripts": {
     "ci": "./scripts/ci",
@@ -15,5 +21,9 @@
     "test": "./scripts/test",
     "test:watch": "./scripts/test-watch"
   },
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "dependencies": {
+    "firost": "2.0.5",
+    "golgoth": "1.4.0"
+  }
 }

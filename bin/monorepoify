@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+const monorepoify = require('../main.js');
+(async () => {
+  await monorepoify.run(process.argv.slice(2)[0]);
+})();

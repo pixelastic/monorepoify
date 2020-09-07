@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "norska": "1.0.4",
+    "norska-theme-docs": "1.0.7"
+  },
+  "files": [],
+  "homepage": "https://projects.pixelastic.com/{name}/",
+  "keywords": [],
+  "name": "{name}-docs",
+  "private": true,
+  "scripts": {
+    "lint": "../scripts/docs/lint",
+    "lint:fix": "../scripts/docs/lint-fix",
+    "build": "../scripts/docs/build",
+    "build:prod": "../scripts/docs/build-prod",
+    "cms": "../scripts/docs/cms",
+    "serve": "../scripts/docs/serve"
+  },
+  "version": "{version}"
+}
