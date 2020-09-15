@@ -131,6 +131,26 @@ module.exports = {
     const dataPath = this.rootPath('docs/src/_data/site.json');
     await writeJson(siteData, dataPath);
 
+    const themeConfig = {
+      navigation: [
+        {
+          name: 'Overview',
+          links: [
+            {
+              title: 'Getting Started',
+              href: 'gettingStarted',
+            },
+          ],
+        },
+        {
+          name: 'API',
+          links: ['init', 'read', 'write'],
+        },
+      ],
+    };
+    const themeConfigPath = this.rootPath('docs/src/_data/theme.json');
+    await writeJson(themeConfig, themeConfigPath);
+
     // Define the theme
     const norskaConfig = dedent`
     const theme = require('norska-theme-docs');
@@ -139,6 +159,17 @@ module.exports = {
       theme,
     }`;
     await write(norskaConfig, this.rootPath('docs/norska.config.js'));
+
+    // Set the readme as the default index page
+    const readmeContent = await read(this.rootPath('README.md'));
+    const indexContent = dedent`
+    ---
+    title: ${name}
+    ---
+
+    ${readmeContent}`;
+    await write(indexContent, this.rootPath('docs/src/index.md'));
+    await remove(this.rootPath('docs/src/index.pug'));
   },
 
   // Helper functions
