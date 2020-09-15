@@ -58,6 +58,7 @@ module.exports = {
       main: 'main.js',
       files,
       scripts,
+      repository: `pixelastic/${name}`,
       homepage: `https://projects.pixelastic.com/${name}/`,
     };
     await writeJson(libPackage, this.rootPath('lib/package.json'));
