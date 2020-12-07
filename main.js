@@ -120,7 +120,8 @@ module.exports = {
     const docsToml = this.rootPath('./docs/netlify.toml');
     const rootToml = this.rootPath('./netlify.toml');
     let netlifyConf = await read(docsToml);
-    netlifyConf = netlifyConf.replace('"./dist/"', '"./docs/dist"');
+    netlifyConf = netlifyConf.replace('"./dist/"', '"docs/dist"');
+    netlifyConf = netlifyConf.replace('"dist/"', '"docs/dist"');
     await write(netlifyConf, rootToml);
     await remove(docsToml);
 
