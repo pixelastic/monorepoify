@@ -25,6 +25,8 @@ module.exports = {
   },
 
   // Prepare the docs folder
+  // Create the directory, puts a package.json with links to documentation
+  // website and set default dependencies
   async prepareDocs() {
     const baseData = await this.initialPackage();
     const { name, version } = baseData;
@@ -37,6 +39,9 @@ module.exports = {
     await writeJson(template, this.rootPath('docs/package.json'));
   },
   // Prepare the lib folder
+  // Create the directory, create a package that references the same file as
+  // before but in a ./lib folder, same for all the scripts
+  //
   async prepareLib() {
     const baseData = await this.initialPackage();
     const { name } = baseData;
@@ -123,13 +128,12 @@ module.exports = {
     const libPackage = await readJson(this.rootPath('lib/package.json'));
     const { description, name, homepage } = libPackage;
     const siteData = {
-      defaultDescription: description,
-      defaultTitle: name,
-      defaultUrl: homepage,
-      defaultAuthor: 'Tim Carry',
-      defaultTwitter: 'pixelastic',
+      description,
+      title: name,
+      productionUrl: homepage,
+      twitter: 'pixelastic',
     };
-    const dataPath = this.rootPath('docs/src/_data/site.json');
+    const dataPath = this.rootPath('docs/src/_data/meta.json');
     await writeJson(siteData, dataPath);
 
     const themeConfig = {
@@ -161,8 +165,12 @@ module.exports = {
     }`;
     await write(norskaConfig, this.rootPath('docs/norska.config.js'));
 
-    // Set the readme as the default index page
-    const readmeContent = await read(this.rootPath('README.md'));
+    // Configure readme.
+    // We move the current Readme to docs/src/index.pug
+    // We delete the main readme, it will be regenerated on commit
+    // The lib readme is a link to the host readme
+    const hostReadmePath = this.rootPath('README.md');
+    const readmeContent = await read(hostReadmePath);
     const indexContent = dedent`
     ---
     title: ${name}
@@ -171,6 +179,13 @@ module.exports = {
     ${readmeContent}`;
     await write(indexContent, this.rootPath('docs/src/index.md'));
     await remove(this.rootPath('docs/src/index.pug'));
+
+    // Regenerate host reamde
+    await remove(hostReadmePath);
+    await run('yarn aberlaas readme');
+    // Link lib readme
+    const libReadmePath = this.rootPath('lib/README.md');
+    await run(`ln -s ${hostReadmePath} ${libReadmePath}`);
   },
 
   // Helper functions
