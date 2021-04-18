@@ -167,9 +167,8 @@ module.exports = {
     await write(norskaConfig, this.rootPath('docs/norska.config.js'));
 
     // Configure readme.
-    // We move the current Readme to docs/src/index.pug
-    // We delete the main readme, it will be regenerated on commit
-    // The lib readme is a link to the host readme
+    // We move the current Readme to docs/src/index.md
+    // We delete the main readme and ./lib readme, they will be regenerated on commit
     const hostReadmePath = this.rootPath('README.md');
     const readmeContent = await read(hostReadmePath);
     const indexContent = dedent`
@@ -182,11 +181,9 @@ module.exports = {
     await remove(this.rootPath('docs/src/index.pug'));
 
     // Regenerate host reamde
-    await remove(hostReadmePath);
+    await remove(this.rootPath('README.md'));
+    await remove(this.rootPath('lib/README.md'));
     await run('yarn aberlaas readme');
-    // Link lib readme
-    const libReadmePath = this.rootPath('lib/README.md');
-    await run(`ln -s ${hostReadmePath} ${libReadmePath}`);
   },
 
   // Helper functions
