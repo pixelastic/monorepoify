@@ -129,7 +129,7 @@ module.exports = {
     const libPackage = await readJson(this.rootPath('lib/package.json'));
     const { description, name, homepage } = libPackage;
     const siteData = {
-      description,
+      description: description || '',
       title: name,
       productionUrl: homepage,
       twitter: 'pixelastic',
