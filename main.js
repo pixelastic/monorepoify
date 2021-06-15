@@ -170,11 +170,15 @@ module.exports = {
     // We move the current Readme to docs/src/index.md
     // We delete the main readme and ./lib readme, they will be regenerated on commit
     const hostReadmePath = this.rootPath('README.md');
-    const readmeContent = await read(hostReadmePath);
+    const readmeContent = _.chain(await read(hostReadmePath))
+      .replace(`# ${name}`, '')
+      .value();
     const indexContent = dedent`
     ---
     title: ${name}
     ---
+
+    <div class="lead">${description}</div>
 
     ${readmeContent}`;
     await write(indexContent, this.rootPath('docs/src/index.md'));
