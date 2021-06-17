@@ -24,6 +24,6 @@
   "version": "0.0.1",
   "dependencies": {
     "firost": "2.0.5",
-    "golgoth": "1.4.0"
+    "golgoth": "2.0.0"
   }
 }

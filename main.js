@@ -8,8 +8,8 @@ const copy = require('firost/copy');
 const remove = require('firost/remove');
 const isDirectory = require('firost/isDirectory');
 const move = require('firost/move');
-const _ = require('golgoth/lib/lodash');
-const dedent = require('golgoth/lib/dedent');
+const _ = require('golgoth/lodash');
+const dedent = require('golgoth/dedent');
 
 module.exports = {
   async run(cliRootPath) {
@@ -112,6 +112,7 @@ module.exports = {
       shell: true,
       stdin: true,
     });
+    await remove(path.resolve(docsPath, 'scripts'));
   },
 
   // Fixes after install
