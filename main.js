@@ -23,6 +23,31 @@ module.exports = {
 
     await this.postInstallDocs();
   },
+  // Prepare the root
+  async prepareRoot() {
+    // Remove any yarn link at the root
+    await run('yarn unlink');
+
+    const baseData = await this.initialPackage();
+    const { name, version } = baseData;
+
+    // Write package.json
+    const template = await this.getTemplate('package.json');
+    template.name = template.name.replace('{name}', name);
+    template.description = template.description.replace('{name}', name);
+    template.homepage = template.homepage.replace('{name}', name);
+    await writeJson(template, this.rootPath('package.json'));
+
+    // Replace scripts
+    await remove(this.rootPath('scripts'));
+    await copy(this.templatePath('scripts'), this.rootPath('scripts'));
+
+    // Configure lerna
+    const lernaConfig = await this.getTemplate('lerna.json');
+    lernaConfig.version = version;
+    const lernaFinal = await this.rootPath('lerna.json');
+    await writeJson(lernaConfig, lernaFinal);
+  },
 
   // Prepare the docs folder
   // Create the directory, puts a package.json with links to documentation
@@ -41,7 +66,6 @@ module.exports = {
   // Prepare the lib folder
   // Create the directory, create a package that references the same file as
   // before but in a ./lib folder, same for all the scripts
-  //
   async prepareLib() {
     const baseData = await this.initialPackage();
     const { name } = baseData;
@@ -72,28 +96,10 @@ module.exports = {
     if (await isDirectory(this.rootPath('bin/'))) {
       await move(this.rootPath('bin/'), this.rootPath('lib/bin'));
     }
-  },
-  // Prepare the root
-  async prepareRoot() {
-    const baseData = await this.initialPackage();
-    const { name, version } = baseData;
 
-    // Write package.json
-    const template = await this.getTemplate('package.json');
-    template.name = template.name.replace('{name}', name);
-    template.description = template.description.replace('{name}', name);
-    template.homepage = template.homepage.replace('{name}', name);
-    await writeJson(template, this.rootPath('package.json'));
-
-    // Replace scripts
-    await remove(this.rootPath('scripts'));
-    await copy(this.templatePath('scripts'), this.rootPath('scripts'));
-
-    // Configure lerna
-    const lernaConfig = await this.getTemplate('lerna.json');
-    lernaConfig.version = version;
-    const lernaFinal = await this.rootPath('lerna.json');
-    await writeJson(lernaConfig, lernaFinal);
+    // Add a yarn link here
+    const libPath = this.rootPath('lib');
+    await run(`cd ${libPath} && yarn link`, { shell: true });
   },
   // Install all dependencies
   async install() {
