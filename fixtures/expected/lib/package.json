@@ -1,0 +1,17 @@
+{
+  "name": "reddinx",
+  "main": "main.js",
+  "files": ["helper.js", "bin/reddinx"],
+  "bin": {
+    "reddinx": "bin/reddinx"
+  },
+  "scripts": {
+    "ci": "../scripts/lib/ci",
+    "husky:precommit": "../scripts/lib/husky-precommit",
+    "lint": "../scripts/lib/lint",
+    "lint:fix": "../scripts/lib/lint-fix",
+    "release": "../scripts/lib/release",
+    "test": "../scripts/lib/test",
+    "test:watch": "../scripts/lib/test-watch"
+  }
+}
