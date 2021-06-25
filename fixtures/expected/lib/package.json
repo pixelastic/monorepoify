@@ -1,9 +1,17 @@
 {
   "name": "reddinx",
+  "version": "1.2.3",
+  "repository": "pixelastic/reddinx",
+  "homepage": "https://projects.pixelastic.com/reddinx/",
+  "author": "Tim Carry (@pixelastic)",
+  "license": "MIT",
   "main": "main.js",
   "files": ["helper.js", "bin/reddinx"],
   "bin": {
     "reddinx": "bin/reddinx"
+  },
+  "devDependencies": {
+    "get-port": "2.4.5"
   },
   "scripts": {
     "ci": "../scripts/lib/ci",
