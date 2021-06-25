@@ -1,15 +1,15 @@
 {
   "private": true,
-  "name": "{name}-monorepo",
-  "description": "{name} monorepo",
-  "homepage": "https://projects.pixelastic.com/{name}/",
+  "name": "reddinx-monorepo",
+  "description": "reddinx monorepo",
+  "homepage": "https://projects.pixelastic.com/reddinx/",
   "keywords": [],
-  "workspaces": [
-    "lib",
-    "docs"
-  ],
+  "workspaces": ["lib", "docs"],
   "files": [],
-  "devDependencies": {},
+  "devDependencies": {
+    "lerna": "1.42",
+    "aberlaas": "1.42"
+  },
   "scripts": {
     "build": "./scripts/docs/build",
     "build:prod": "./scripts/docs/build-prod",
@@ -24,3 +24,4 @@
     "test:watch": "./scripts/lib/test-watch"
   }
 }
+

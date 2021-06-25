@@ -28,25 +28,25 @@ module.exports = {
     // Remove any yarn link at the root
     await run('yarn unlink');
 
-    const baseData = await this.initialPackage();
-    const { name, version } = baseData;
+    // const baseData = await this.initialPackage();
+    // const { name, version } = baseData;
 
-    // Write package.json
-    const template = await this.getTemplate('package.json');
-    template.name = template.name.replace('{name}', name);
-    template.description = template.description.replace('{name}', name);
-    template.homepage = template.homepage.replace('{name}', name);
-    await writeJson(template, this.rootPath('package.json'));
+    // // Write package.json
+    // const template = await this.getTemplate('package.json');
+    // template.name = template.name.replace('{name}', name);
+    // template.description = template.description.replace('{name}', name);
+    // template.homepage = template.homepage.replace('{name}', name);
+    // await writeJson(template, this.rootPath('package.json'));
 
-    // Replace scripts
-    await remove(this.rootPath('scripts'));
-    await copy(this.templatePath('scripts'), this.rootPath('scripts'));
+    // // Replace scripts
+    // await remove(this.rootPath('scripts'));
+    // await copy(this.templatePath('scripts'), this.rootPath('scripts'));
 
-    // Configure lerna
-    const lernaConfig = await this.getTemplate('lerna.json');
-    lernaConfig.version = version;
-    const lernaFinal = await this.rootPath('lerna.json');
-    await writeJson(lernaConfig, lernaFinal);
+    // // Configure lerna
+    // const lernaConfig = await this.getTemplate('lerna.json');
+    // lernaConfig.version = version;
+    // const lernaFinal = await this.rootPath('lerna.json');
+    // await writeJson(lernaConfig, lernaFinal);
   },
 
   // Prepare the docs folder
@@ -69,33 +69,33 @@ module.exports = {
   async prepareLib() {
     const baseData = await this.initialPackage();
     const { name } = baseData;
-    const files = _.chain(baseData)
-      .get('files')
-      .map((file) => {
-        return file.replace('lib/', '');
-      })
-      .value();
-    const scripts = _.chain(baseData)
-      .get('scripts')
-      .transform((result, value, key) => {
-        result[key] = value.replace('./scripts/', '../scripts/lib/');
-      })
-      .value();
-    const libPackage = {
-      ...baseData,
-      devDependencies: undefined,
-      main: 'main.js',
-      files,
-      scripts,
-      repository: `pixelastic/${name}`,
-      homepage: `https://projects.pixelastic.com/${name}/`,
-    };
-    await writeJson(libPackage, this.rootPath('lib/package.json'));
+    // const files = _.chain(baseData)
+    //   .get('files')
+    //   .map((file) => {
+    //     return file.replace('lib/', '');
+    //   })
+    //   .value();
+    // const scripts = _.chain(baseData)
+    //   .get('scripts')
+    //   .transform((result, value, key) => {
+    //     result[key] = value.replace('./scripts/', '../scripts/lib/');
+    //   })
+    //   .value();
+    // const libPackage = {
+    //   ...baseData,
+    //   devDependencies: undefined,
+    //   main: 'main.js',
+    //   files,
+    //   scripts,
+    //   repository: `pixelastic/${name}`,
+    //   homepage: `https://projects.pixelastic.com/${name}/`,
+    // };
+    // await writeJson(libPackage, this.rootPath('lib/package.json'));
 
-    // Move bin directory if available
-    if (await isDirectory(this.rootPath('bin/'))) {
-      await move(this.rootPath('bin/'), this.rootPath('lib/bin'));
-    }
+    // // Move bin directory if available
+    // if (await isDirectory(this.rootPath('bin/'))) {
+    //   await move(this.rootPath('bin/'), this.rootPath('lib/bin'));
+    // }
 
     // Add a yarn link here
     const libPath = this.rootPath('lib');
@@ -103,10 +103,10 @@ module.exports = {
   },
   // Install all dependencies
   async install() {
-    // Dev dependencies
-    await run('yarn install && yarn upgrade aberlaas@latest lerna@latest', {
-      shell: true,
-    });
+    // // Dev dependencies
+    // await run('yarn install && yarn upgrade aberlaas@latest lerna@latest', {
+    //   shell: true,
+    // });
 
     // Docs
     const docsPath = this.rootPath('docs');
