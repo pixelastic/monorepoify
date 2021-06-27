@@ -12,46 +12,9 @@ const _ = require('golgoth/lodash');
 const dedent = require('golgoth/dedent');
 
 module.exports = {
-  // Prepare the docs folder
-  // Create the directory, puts a package.json with links to documentation
-  // website and set default dependencies
-  async prepareDocs() {
-    const baseData = await this.initialPackage();
-    const { name, version } = baseData;
-
-    // Write package.json
-    const template = await this.getTemplate('docs/package.json');
-    template.homepage = template.homepage.replace('{name}', name);
-    template.name = template.name.replace('{name}', name);
-    template.version = template.version.replace('{version}', version);
-    await writeJson(template, this.rootPath('docs/package.json'));
-  },
-  // Install all dependencies
-  async install() {
-    // Docs
-    const docsPath = this.rootPath('docs');
-    await run(
-      `cd ${docsPath} && yarn upgrade norska@latest norska-theme-docs@latest && yarn install`,
-      { shell: true }
-    );
-    await run(`cd ${docsPath} && yarn run norska init`, {
-      shell: true,
-      stdin: true,
-    });
-    await remove(path.resolve(docsPath, 'scripts'));
-  },
 
   // Fixes after install
   async postInstallDocs() {
-    // Update netlify.toml
-    const docsToml = this.rootPath('./docs/netlify.toml');
-    const rootToml = this.rootPath('./netlify.toml');
-    let netlifyConf = await read(docsToml);
-    netlifyConf = netlifyConf.replace('"./dist/"', '"docs/dist"');
-    netlifyConf = netlifyConf.replace('"dist/"', '"docs/dist"');
-    await write(netlifyConf, rootToml);
-    await remove(docsToml);
-
     // Fill the meta
     const libPackage = await readJson(this.rootPath('lib/package.json'));
     const { description, name, homepage } = libPackage;
@@ -81,6 +44,7 @@ module.exports = {
         },
       ],
     };
+    // TODO: Also add the docSearch part
     const themeConfigPath = this.rootPath('docs/src/_data/theme.json');
     await writeJson(themeConfig, themeConfigPath);
 
