@@ -12,16 +12,6 @@ const _ = require('golgoth/lodash');
 const dedent = require('golgoth/dedent');
 
 module.exports = {
-  async run(cliRootPath) {
-    this.set('rootPath', path.resolve(cliRootPath || '.'));
-
-    await this.prepareDocs();
-
-    await this.install();
-
-    await this.postInstallDocs();
-  },
-
   // Prepare the docs folder
   // Create the directory, puts a package.json with links to documentation
   // website and set default dependencies

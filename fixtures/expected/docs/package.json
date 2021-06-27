@@ -1,8 +1,11 @@
 {
   "private": true,
-  "name": "{name}-docs",
-  "version": "{version}",
-  "dependencies": {},
+  "name": "reddinx-docs",
+  "version": "1.2.3",
+  "dependencies": {
+    "norska": "1.42",
+    "norska-theme-docs": "1.42"
+  },
   "files": [],
   "scripts": {
     "build": "../scripts/docs/build",
