@@ -1,13 +1,16 @@
 # monorepoify
 
-This repository holds a local script I have been using to transform repositories
-I have into monorepos. It creates a `./lib` and `./docs` folder with their own
-dependencies using lerna and yarn workspaces.
+⚠ This module is not meant to be used by anything but me.
 
-I didn't release it as a module as I expect to be using it only a handful of
-times, and don't expect anyone else to need it as it's pretty tied to the way
-**I** organize my files.
+Run `monorepoify` in any directory holding a library created by `aberlaas init`,
+and it will automatically modify the structure to add a `./docs` and `./lib`
+subfolders.
 
-Still, having it in a script on GitHub allows me to revert to previous versions
-in case of bugs, use modules and document the process.
+The `./lib` subfolder will contain the actual code of the module.
+
+The `./docs` subfolder will contain a documentation website made with `norska`
+and `norska-theme-docs`.
+
+The root will contain the Yarn workspaces and lerna configuration to handle this
+monorepo setup.
 

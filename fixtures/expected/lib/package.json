@@ -1,5 +1,6 @@
 {
   "name": "reddinx",
+  "description": "Index any subreddit",
   "version": "1.2.3",
   "repository": "pixelastic/reddinx",
   "homepage": "https://projects.pixelastic.com/reddinx/",

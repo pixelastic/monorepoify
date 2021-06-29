@@ -1,5 +1,6 @@
 {
   "name": "reddinx",
+  "description": "Index any subreddit",
   "main": "lib/main.js",
   "repository": "https://github.com/pixelastic/reddinx/",
   "bugs": "https://github.com/pixelastic/reddinx/issues",

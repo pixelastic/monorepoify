@@ -5,3 +5,6 @@
 # node_modules in subfolders are not ignored by default
 node_modules/
 
+# Templates are not meant to be linted
+templates/
+
