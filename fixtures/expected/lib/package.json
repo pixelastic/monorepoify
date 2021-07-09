@@ -15,11 +15,12 @@
     "get-port": "2.4.5"
   },
   "scripts": {
-    "ci": "../scripts/lib/ci",
-    "husky:precommit": "../scripts/lib/husky-precommit",
+    "build": "../scripts/docs/build",
+    "build:prod": "../scripts/docs/build-prod",
     "lint": "../scripts/lib/lint",
     "lint:fix": "../scripts/lib/lint-fix",
-    "release": "../scripts/lib/release",
+    "release": "../scripts/release",
+    "serve": "../scripts/docs/serve",
     "test": "../scripts/lib/test",
     "test:watch": "../scripts/lib/test-watch"
   }

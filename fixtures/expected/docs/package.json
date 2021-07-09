@@ -13,6 +13,9 @@
     "cms": "../scripts/docs/cms",
     "lint": "../scripts/docs/lint",
     "lint:fix": "../scripts/docs/lint-fix",
-    "serve": "../scripts/docs/serve"
+    "release": "../scripts/release",
+    "serve": "../scripts/docs/serve",
+    "test": "../scripts/lib/test",
+    "test:watch": "../scripts/lib/test-watch"
   }
 }
